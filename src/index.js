@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 
 const styles = require('./styles');
 
-const { bool, func, number, string } = PropTypes;
+const { bool, func, number, string, object } = PropTypes;
 
 const window = Dimensions.get('window');
 
@@ -47,6 +47,7 @@ const IPropTypes = {
   renderStickyHeader: func,
   stickyHeaderHeight: number,
   contentContainerStyle: ViewPropTypes ? ViewPropTypes.style : View.propTypes.style,
+  containerProps: object,
 };
 
 class ParallaxScrollView extends Component {
@@ -86,12 +87,13 @@ class ParallaxScrollView extends Component {
       stickyHeaderHeight,
       style,
       contentContainerStyle,
+      containerProps,
       ...scrollViewProps
     } = this.props;
 
     const background = this._renderBackground({ fadeOutBackground, backgroundScrollSpeed, backgroundScaleSpeed, backgroundColor, parallaxHeaderHeight, stickyHeaderHeight, renderBackground });
     const foreground = this._renderForeground({ fadeOutForeground, parallaxHeaderHeight, stickyHeaderHeight, renderForeground: renderForeground || renderParallaxHeader });
-    const bodyComponent = this._wrapChildren(children, { contentBackgroundColor, stickyHeaderHeight, contentContainerStyle });
+    const bodyComponent = this._wrapChildren(children, { contentBackgroundColor, stickyHeaderHeight, contentContainerStyle, containerProps });
     const footerSpacer = this._renderFooterSpacer({ contentBackgroundColor });
     const maybeStickyHeader = this._maybeRenderStickyHeader({ parallaxHeaderHeight, stickyHeaderHeight, backgroundColor, renderFixedHeader, renderStickyHeader });
     const scrollElement = renderScrollComponent(scrollViewProps);
@@ -246,7 +248,7 @@ class ParallaxScrollView extends Component {
     );
   }
 
-  _wrapChildren(children, { contentBackgroundColor, stickyHeaderHeight, contentContainerStyle }) {
+  _wrapChildren(children, { contentBackgroundColor, stickyHeaderHeight, contentContainerStyle, containerProps }) {
     const { viewHeight } = this.state;
     const containerStyles = [{backgroundColor: contentBackgroundColor}];
 
@@ -255,6 +257,7 @@ class ParallaxScrollView extends Component {
 
     return (
       <View
+        {...containerProps}
         style={containerStyles}
         onLayout={e => {
                 // Adjust the bottom height so we can scroll the parallax header all the way up.
@@ -334,7 +337,8 @@ ParallaxScrollView.defaultProps = {
   renderParallaxHeader: renderEmpty, // Deprecated (will be removed in 0.18.0)
   renderForeground: null,
   stickyHeaderHeight: 0,
-  contentContainerStyle: null
+  contentContainerStyle: null,
+  containerProps:{},
 };
 
 module.exports = ParallaxScrollView;
